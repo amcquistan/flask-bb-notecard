@@ -7,6 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}{% endblock %}</title>
         <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='css/site.css')}}">
     </head>
     <body>
         <header>
@@ -16,36 +17,56 @@
                         <a href="{{url_for('home.home')}}" class="navbar-brand">Studious</a>
                     </div>
                     <ul class="nav navbar-nav">
-                        <li><a href="">Subjects</a></li>
+                        <li><a href="{{url_for('subject.index')}}">Subjects</a></li>
                         <li><a href="">Cards</a></li>
                         <li><a href="">Tags</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="{{url_for('login.register')}}"><span class='glyphicon glyphicon-user'></span> Sign Up</a></li>
-                        <li><a href="{{url_for('login.login')}}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                    {% if not current_user.is_authenticated %}
+                        <li>
+                            <a href="{{url_for('login.register')}}">
+                                <span class='glyphicon glyphicon-user'></span> Sign Up
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{url_for('login.login')}}">
+                                <span class="glyphicon glyphicon-log-in"></span> Login
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{{url_for('login.logout')}}">
+                                <span class="glyphicon glyphicon-log-out"></span> Logout
+                            </a>
+                        </li>
+                    {% endif %}
                     </ul>
                 </div>
             </div>
         </header>
         <div class="container">
-            {% with messages = get_flashed_messages() %}
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                    <ul class=flashes>
-                    {% for message in messages %}
-                    <li>{{ message }}</li>
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{category}} alert-dismissible" role='alert'>
+                            <button class="close" type='button' data-dismiss='alert' aria-label='Close'>
+                                <span aria-hidden='true'>&times;</span>
+                            </button>
+                            {{ message }}
+                        </div>
                     {% endfor %}
-                    </ul>
                 {% endif %}
             {% endwith %}
-
-            {% block body %}
-
-            {% endblock %}
         </div>
 
+        {% block body %}
+        {% endblock %}
+        
         <script src="{{url_for('static',filename='js/jquery-2.2.2.min.js')}}"></script>
         <script src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
         {% block js %}
+
         {% endblock %}
     </body>
 </html>

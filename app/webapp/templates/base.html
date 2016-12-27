@@ -63,8 +63,16 @@
         {% block body %}
         {% endblock %}
         
-        <script src="{{url_for('static',filename='js/jquery-2.2.2.min.js')}}"></script>
-        <script src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
+        <script src="{{url_for('static',filename='js/libs/jquery-2.2.2.min.js')}}"></script>
+        <script src="{{url_for('static',filename='js/libs/bootstrap.min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/libs/underscore-min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/libs/backbone-min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/models.js')}}"></script>
+
+        {% block templates %}
+
+        {% endblock %}
+
         {% block js %}
 
         {% endblock %}

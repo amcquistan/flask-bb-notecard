@@ -13,9 +13,11 @@ itsdangerous==0.24
 Jinja2==2.8
 Mako==1.0.6
 MarkupSafe==0.23
+Medea==0.3.2
 psycopg2==2.6.2
 pycparser==2.17
 python-editor==1.0.3
+singledispatch==3.4.0.3
 six==1.10.0
 SQLAlchemy==1.1.4
 Werkzeug==0.11.11

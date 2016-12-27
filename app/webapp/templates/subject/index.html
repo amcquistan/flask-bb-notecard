@@ -3,19 +3,74 @@
 {% block title %}Subjects{% endblock %}
 
 {% block body %}
-<div class="container">
+
 <div class="body-header">
     <h1>Subjects</h1>
 </div>
 
-<div class="row">
-    <div class="col-lg-offset-1 col-lg-10">
+<div class="container">
+    <div class="row">
         
-    </div>
-</div>
+        <div class="col-md-offset-1 col-md-6">
+            <div id="subjects"></div>
+        </div>
 
+        <div class="col-md-3">
+            <h4>Most Recent Subjects</h4>
+            
+        </div>
+
+    </div>
 </div>
 
 {% endblock %}
 
+{% block templates %}
+
+<script type='text/html' id='subjectTmpl'>
+    <div class="subject">
+        <div class="col-md-12">
+            <h2><%= name %></h2>
+        </div>
+        <div class="col-md-12">
+            <%= description %>
+        </div>
+    </div>
+    
+</script>
+
+
+<script type='text/html'>
+    <div class="list-group">
+        <a class="list-group-item" href=""><%= name %> <span class="badge">0%</span></a>
+    </div>
+</script>
+
+
+{% endblock %}
+
+{% block js %}
+
+<script src="{{url_for('static', filename='js/views.js')}}"></script>
+
+<script>
+    //$(function(){
+
+        var subjects;
+
+        {% if subjects %}
+        subjects  = new app.Subjects({{ subjects | tojson }});
+        {% else %}
+        subjects  = new app.Subjects([]);
+        {% endif %}
+
+        subjects.url = "{{url_for('subject.index')}}";
+
+        var subjectsView = new app.SubjectsView({el: '#subjects', collection: subjects,});
+        subjectsView.render();
+   // });
+
+</script>
+
+{% endblock %}
 

@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from extensions import bcrypt
 from flask_login import AnonymousUserMixin
+from medea import medea, MedeaMapper
 
 db = SQLAlchemy()
 
@@ -42,6 +43,10 @@ class User(db.Model):
     def __repr__(self):
         return "<User: '{}'>".format(self.username)
 
+medea.register(User, MedeaMapper(
+    'id', 'username'
+))
+
 
 class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -55,8 +60,12 @@ class Subject(db.Model):
         self.description = description
         self.user_id = user_id
 
-    def __repr__(self):
-        return "<Subject: '{}'>".format(self.name)
+    # def __repr__(self):
+    #     return "<Subject: '{}'>".format(self.name)
+
+medea.register(Subject, MedeaMapper(
+    'id', 'name', 'description', 'user_id'
+))
 
 
 class Card(db.Model):
@@ -77,3 +86,7 @@ class Card(db.Model):
     def __repr__(self):
         return "<Card: '{}'>".format(self.name)
 
+medea.register(Card, MedeaMapper(
+    'id', 'name', 'description', 'image_path',
+    'correct_responses', 'total_views', 'subject_id'
+))

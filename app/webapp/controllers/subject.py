@@ -1,8 +1,9 @@
 
-from flask import render_template, url_for, Blueprint, redirect, request, flash, session
+from flask import render_template, url_for, Blueprint, redirect, request, flash, session, jsonify
 from flask_login import login_required, current_user
-from ..models import db, User
+from ..models import db, User, Subject
 from ..forms import SubjectForm
+from medea import medea, MedeaMapper
 
 subject_bp = Blueprint(
     'subject',
@@ -11,10 +12,19 @@ subject_bp = Blueprint(
 )
 
 
-@subject_bp.route('/')
+@subject_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    return render_template('subject/index.html')
+    if request.method == 'POST':
+        args = request.get_json()
+        print args
+        s = Subject(name=args['name'], description=args['description'], user_id=current_user.id)
+        db.session.add(s)
+        db.session.commit()
+        return jsonify(s)
+
+    subjects = Subject.query.filter_by(user_id=current_user.id).all()
+    return render_template('subject/index.html', subjects=subjects)
 
 
 @subject_bp.route('/<int:id>')

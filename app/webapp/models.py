@@ -53,7 +53,7 @@ class Subject(db.Model):
     name = db.Column(db.String(100))
     description = db.Column(db.String(255))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    cards = db.relationship('Card', backref='card', lazy='dynamic')
+    cards = db.relationship('Card', backref='subject', lazy='dynamic')
 
     def __init__(self, name, user_id, description=None):
         self.name = name
@@ -70,23 +70,25 @@ medea.register(Subject, MedeaMapper(
 
 class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
+    title = db.Column(db.String(100))
     description = db.Column(db.String(650))
+    answer = db.Column(db.String(100))
     image_path = db.Column(db.String(100))
     correct_responses = db.Column(db.Integer)
     total_views = db.Column(db.Integer)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'))
     
-    def __init__(self, name, description, subject_id, image_path=None):
-        self.name = name
+    def __init__(self, title, description, answer, subject_id, image_path=None):
+        self.title = title
         self.description = description
+        self.answer = answer
         self.subject_id = subject_id
         self.image_path = image_path
 
     def __repr__(self):
-        return "<Card: '{}'>".format(self.name)
+        return "<Card: '{}'>".format(self.title)
 
 medea.register(Card, MedeaMapper(
-    'id', 'name', 'description', 'image_path',
+    'id', 'title', 'description', 'image_path', 'answer',
     'correct_responses', 'total_views', 'subject_id'
 ))

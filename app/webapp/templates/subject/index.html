@@ -12,7 +12,12 @@
     <div class="row">
         
         <div class="col-md-offset-1 col-md-6">
-            <div id="subjects"></div>
+            
+            <div id="subjects-container">
+                <h5><a href="#" id='new-subject'><i class="fa fa-plus" aria-hidden="true"></i> New Subject</a></h5>
+                <div id="subjects"></div>
+            </div>
+
         </div>
 
         <div class="col-md-3">
@@ -30,13 +35,73 @@
 <script type='text/html' id='subjectTmpl'>
     <div class="subject">
         <div class="col-md-12">
-            <h2><%= name %></h2>
+            <h2><%= name %> <a href="#" class='subject-edit-lnk'><i class="fa fa-pencil" aria-hidden="true"></i></a></h2>
         </div>
         <div class="col-md-12">
             <%= description %>
         </div>
+        <div class="col-md-12" style='margin-top:25px;'>
+            <a href="{{url_for('subject.subjects')}}<%= id %>/card" class="btn btn-primary"><i class="fa fa-book" aria-hidden="true"></i> Study Cards</a>
+        </div>
     </div>
-    
+</script>
+
+<script type='text/html' id='subjectEditTmpl'>
+    <div class="subject subject-edit ">
+        
+        <div class="form-horizontal" id='edit-input-div'>
+            <h3>Editting...</h3>
+            <div class="col-md-12 form-group">
+                <div class="col-md-3">
+                    <label for='name'>Name: </label>
+                </div>
+                <div class="col-md-9">
+                    <input type="text" id='name' name='name' value="<%= name %>" class='form-control'>
+                </div>
+            </div>
+            <div class="col-md-12 form-group">
+                <div class="col-md-3">
+                    <label for='description'>Description: </label>
+                </div>
+                <div class="col-md-9">
+                    <textarea id='description' name="description" cols="30" rows="3" class='form-control text-left'><%= description %></textarea>
+                </div>
+            </div>
+            <div class="col-md-12" style='margin-top:5px;'>
+                <a href="" class="btn btn-danger subject-cancel-edit"><i class="fa fa-undo" aria-hidden="true"></i> Cancel</a>
+                <a href="" class="btn btn-success pull-right subject-save-edit"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</a>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<script type='text/html' id='subjectNewTmpl'>
+    <div class="subject subject-edit ">
+        <div id='new-input-div' class="form-horizontal">
+            <h3>Creating...</h3>
+            <div class="col-md-12 form-group">
+                <div class="col-md-3">
+                    <label for='name'>Name: </label>
+                </div>
+                <div class="col-md-9">
+                    <input type="text" id='name' name='name' placeholder='subject name' class='form-control'>
+                </div>
+            </div>
+            <div class="col-md-12 form-group">
+                <div class="col-md-3">
+                    <label for='description'>Description: </label>
+                </div>
+                <div class="col-md-9">
+                    <textarea id='description' name="description" cols="30" rows="3" class='form-control text-left' placeholder='subject description'></textarea>
+                </div>
+            </div>
+            <div class="col-md-12" style='margin-top:5px;'>
+                <a href="#" class="btn btn-danger" id='subject-cancel-new'><i class="fa fa-undo" aria-hidden="true"></i> Cancel</a>
+                <a href="#" class="btn btn-success pull-right" id='subject-save-new'><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</a>
+            </div>
+        </div>
+    </div>
 </script>
 
 
@@ -46,15 +111,15 @@
     </div>
 </script>
 
-
 {% endblock %}
 
 {% block js %}
+{{ super() }}
 
-<script src="{{url_for('static', filename='js/views.js')}}"></script>
+<script src="{{url_for('static', filename='js/views/subject_views.js')}}"></script>
 
 <script>
-    //$(function(){
+    // $(function(){
 
         var subjects;
 
@@ -64,11 +129,14 @@
         subjects  = new app.Subjects([]);
         {% endif %}
 
-        subjects.url = "{{url_for('subject.index')}}";
+        subjects.url = "{{url_for('subject.subjects')}}";
 
-        var subjectsView = new app.SubjectsView({el: '#subjects', collection: subjects,});
+        var subjectsView = new app.SubjectsView({el: '#subjects-container', collection: subjects});
         subjectsView.render();
-   // });
+
+        //var newSubjectView = new app.NewSubjectView({el: '#new-container', collection: subjects});
+        //$('#new-subject').on('click', newSubjectView.render);
+//    });
 
 </script>
 

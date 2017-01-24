@@ -7,6 +7,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}{% endblock %}</title>
         <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+        
+        <script src="https://use.fontawesome.com/3ce300b64a.js"></script>
+
+        {% block styles %}
+        {% endblock %}
+
         <link rel="stylesheet" href="{{url_for('static', filename='css/site.css')}}">
     </head>
     <body>
@@ -17,7 +23,7 @@
                         <a href="{{url_for('home.home')}}" class="navbar-brand">Studious</a>
                     </div>
                     <ul class="nav navbar-nav">
-                        <li><a href="{{url_for('subject.index')}}">Subjects</a></li>
+                        <li><a href="{{url_for('subject.subjects')}}">Subjects</a></li>
                         <li><a href="">Cards</a></li>
                         <li><a href="">Tags</a></li>
                     </ul>
@@ -63,18 +69,24 @@
         {% block body %}
         {% endblock %}
         
-        <script src="{{url_for('static',filename='js/libs/jquery-2.2.2.min.js')}}"></script>
+        <script 
+            src="https://code.jquery.com/jquery-2.2.4.min.js"
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+            crossorigin="anonymous">
+        </script>
         <script src="{{url_for('static',filename='js/libs/bootstrap.min.js')}}"></script>
         <script src="{{url_for('static', filename='js/libs/underscore-min.js')}}"></script>
         <script src="{{url_for('static', filename='js/libs/backbone-min.js')}}"></script>
-        <script src="{{url_for('static', filename='js/models.js')}}"></script>
+        
 
         {% block templates %}
 
         {% endblock %}
 
         {% block js %}
-
+        
+        <script src="{{url_for('static', filename='js/models.js')}}"></script>
+    
         {% endblock %}
     </body>
 </html>

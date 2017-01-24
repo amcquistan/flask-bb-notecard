@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+
+{% block title %}Notecards{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{url_for('static', filename='css/backbone.modal.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/backbone.modal.theme.css')}}">
+    <style>
+        div#show-card {
+                border: 1px solid black;
+                margin-left: 0px;
+                margin-top: 0px;
+                margin-right: 10px;
+                padding: 50px;
+                height: 500px;
+            }
+            div#cards-container {
+                margin-right: 0px;
+                height: 500px;
+                border-left:1px solid black;
+                border-top: 1px solid black; 
+                border-bottom: 1px solid black;
+            }
+
+            .list-group-item:last-child {
+                border-bottom-right-radius: 0px;
+                border-bottom-left-radius: 0px;
+            }
+
+            .view-container {
+                padding: 0px;
+                margin: 0px;
+            }
+    </style>
+
+    
+{% endblock %}
+
+{% block body %}
+
+<div class="body-header">
+    <h1>{{subject.name}} Cards</h1>
+</div>
+
+<div class="container">
+
+    <div id="new-card-popup"></div>
+
+    <div class="row">
+        
+        <div class="col-md-offset-1 col-md-10">
+            
+            <div id="new-card-div" class='col-md-12'>
+                <h5><a href="#" id='new-card'><i class="fa fa-plus" aria-hidden="true"></i> New Card</a></h5>
+                <!-- <div id="cards"></div> -->
+            </div>
+
+            <div class="col-md-3 view-container ">
+                <div id="cards-container" class="list-group"></div>
+            </div>
+
+            <div class="col-md-9 view-container">
+                <div id="show-card"></div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block templates %}
+
+
+
+
+<script type='text/template' id='new-card-modal'>
+    <div class="bbm-modal__topbar">
+      <h3 class="bbm-modal__title">New Card</h3>
+    </div>
+    <div class="bbm-modal__section">
+        <form id='new-card-form' class="form-horizontal">
+            <div class="form-group">
+                <div class="col-md-3">
+                    <label for="title">Title:</label>
+                </div>
+                <div class="col-md-9">
+                    <input name='title' id='title' type="text" class="form-control" placeholder='answer to description / picture goes here...' >
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <label for="description">Description:</label>
+                </div>
+                <div class="col-md-9">
+                    <textarea name="description" id="description" cols="30" rows="3" class='form-control' placeholder='card contents go here...'></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <label for="answer">Answer:</label>
+                </div>
+                <div class="col-md-9">
+                    <input type='text' name="answer" id="answer" class='form-control' placeholder='card answer go here...'/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <label for="fileInput">Image:</label>
+                </div>
+                <div class="col-md-9">
+                    <input type="file" id="fileInput" name='fileInput'>
+                </div>
+            </div>
+            
+        </form>
+    </div>
+    <div class="bbm-modal__bottombar">
+      <a href="#" class="bbm-button" id='bbm-button-save'>save</a>
+      <a href="#" class="bbm-button" id='bbm-button-close'>close</a>
+    </div>
+</script>
+
+<script type='text/template' id='show-card-tmpl'>
+    <div>
+        <div class="row">
+            <div class="col-md-10">
+                <h3><%- title %></h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class='col-md-12'  style='padding: 25px; height: 100px;'>
+                <%- description %>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class='col-md-12'  style='padding: 25px; height: 60px;'>
+                <div id="card-answer" style='display: none;'>
+                    <%- answer %>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class='col-offset-md-1 col-md-10'>
+                <% if (image_path) { %>
+                    <%- image_path %>
+                <% } %>
+            </div>
+        </div>
+        
+        <br/>
+        <br/>
+
+        <div class="row">
+            <div id="show-hide" class='pull-right'>
+                <a href="#" class="btn btn-info show-hide">Show Answer</a>
+                <a href="#" class="btn btn-danger show-hide" style='display: none;'>Hide Answer</a>
+            </div>
+        </div>
+        
+    </div>
+</script>
+
+{% endblock %}
+
+{% block js %}
+{{ super() }}
+
+<script src="{{url_for('static', filename='js/libs/backbone.modal.js')}}"></script>
+<script src="{{url_for('static', filename='js/views/card_views.js')}}"></script>
+
+<script>
+    $(function(){
+
+        var cards,
+            cardsEventBus = _.extend({}, Backbone.Events);
+        
+        {% if cards %}
+        cards = new app.Cards({{ cards | tojson }});
+        {% else %}
+        cards = new app.Cards([]);
+        {% endif %}
+        
+        cards.url = "{{url_for('subject.cards', subject_id=subject.id)}}"
+
+        var cardsView = new app.CardsView({
+            el: '#cards-container',
+            collection: cards,
+            bus: cardsEventBus
+        });
+
+       var showCardView = new app.ShowCardView({
+           el: '#show-card',
+           bus: cardsEventBus
+       });
+
+        // Create a modal view class
+        var Modal = Backbone.Modal.extend({
+            template: '#new-card-modal',
+            cancelEl: '#bbm-button-close'
+        });
+
+
+        $('#new-card').on('click', function(){
+            // Render an instance of your modal
+            var modalView = new Modal();
+            $('#new-card-popup').html(modalView.render().el);
+
+            $('#bbm-button-save').on('click', function(evt){
+                var form = document.getElementById('new-card-form');
+                var formData = new FormData(form);
+                formData.set('imagePath', '');
+                if (form.elements['fileInput'].files.length > 0) {
+                    $.ajax({
+                        url: "{{url_for('subject.card_imageupload', subject_id=subject_id)}}",
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(resp) {
+                            console.log('Successful mock upload', resp);
+                            formData.set('imagePath', resp.filepath);
+                            saveCard(formData);
+                        },
+                        error: function(jqXHR, txtStatus, errorThrown) {
+                            console.log('Something bad happened... ', txtStatus, errorThrown);
+                        }
+                    });
+                } else {
+                    saveCard(formData);
+                }
+                $('#bbm-button-close').trigger('click');
+                evt.preventDefault();
+            });
+        });
+
+        var saveImage = function saveImageFn(formData) {
+
+        };
+
+        var saveCard = function saveCardFn(formData) {
+            var card = new app.Card({
+                title: formData.get('title'),
+                answer: formData.get('answer'),
+                description: formData.get('description'),
+                image_path: formData.get('imagePath')
+            });
+
+            card.url = cards.url;
+            card.save().then(
+                function(response){
+                    cards.add(card);
+                },
+                function(error){
+                    console.log(error);
+                    console.log('there was an error saving the card');
+                }
+            );
+        };
+
+   });
+
+
+   
+
+</script>
+
+{% endblock %}
+
